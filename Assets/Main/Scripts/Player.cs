@@ -6,55 +6,70 @@ namespace RSB.Main.Scripts
 {
 	public class Player : MonoBehaviour
 	{
+		[SerializeField] private Button profileButton;
 		[SerializeField] private Button playerButton;
+		[SerializeField] private RawImage playerImage;
 		[SerializeField] private int playerNumber;
 		[SerializeField] private TextMeshProUGUI playerTMP;
 		public static Action<int> OnShot;
 		[SerializeField] private Color winColor,loseColor;
 
-		private void Awake()
-		{
-			playerButton.interactable = false;
-		}
+		private void Awake() => playerButton.interactable = false;
 
 		private void OnEnable()
 		{
+			profileButton.onClick.AddListener(OpenProfileUI);
 			playerButton.onClick.AddListener(Bang);
-			GM.OnBangReady += ActivateButton;
-			GM.OnGameReady += DisableTMP;
+			GM.OnGameReady += OnGameReady;
+			GM.OnGameReset += OnGameReset;
 			OnShot += DisableButton;
 			OnShot += CalculateShot;
 		}
 
 		private void OnDisable()
 		{
+			profileButton.onClick.RemoveListener(OpenProfileUI);
 			playerButton.onClick.RemoveListener(Bang);
-			GM.OnBangReady -= ActivateButton;
-			GM.OnGameReady -= DisableTMP;
+			GM.OnGameReady -= OnGameReady;
+			GM.OnGameReset -= OnGameReset;
 			OnShot -= DisableButton;
 			OnShot -= CalculateShot;
 		}
 
-		private void ActivateButton()
+		private void OpenProfileUI()
 		{
-			playerButton.interactable = true;
+			ProfileUI.Instance.Enter(playerImage);
 		}
 
 		private void DisableButton(int x)
 		{
 			playerButton.interactable = false;
+			profileButton.targetGraphic.raycastTarget = true;
 		}
 
-		private void DisableTMP()
+		private void OnGameReset()
 		{
-			playerTMP.gameObject.SetActive(false);
 			playerButton.targetGraphic.color = Color.white;
+			playerTMP.gameObject.SetActive(false);
+		}
+		private void OnGameReady()
+		{
+			playerButton.interactable = true;
+			profileButton.targetGraphic.raycastTarget = false;
 		}
 
 		private void CalculateShot(int pNumber)
 		{
-			if(playerNumber == pNumber) Win();
-			else Lose();
+			if(playerNumber == pNumber)
+			{
+				if(GM.CanBang) Win();
+				else Lose();
+			}
+			else
+			{
+				if(GM.CanBang) Lose();
+				else Win();
+			}
 		}
 
 		private void Win()
@@ -74,6 +89,7 @@ namespace RSB.Main.Scripts
 		private void Bang()
 		{
 			OnShot?.Invoke(playerNumber);
+			GM.Shot = true;
 		}
 	}
 }
