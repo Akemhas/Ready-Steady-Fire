@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace RSB.Main.Scripts
 {
-	public class Player : MonoBehaviour
+	public class ReflexPlayer : MonoBehaviour
 	{
 		[SerializeField] private Button profileButton;
 		[SerializeField] private Button playerButton;
@@ -20,8 +20,8 @@ namespace RSB.Main.Scripts
 		{
 			profileButton.onClick.AddListener(OpenProfileUI);
 			playerButton.onClick.AddListener(Bang);
-			GM.OnGameReady += OnGameReady;
-			GM.OnGameReset += OnGameReset;
+			ReflexGm.OnGameReady += OnGameReady;
+			ReflexGm.OnGameReset += OnGameReset;
 			OnShot += DisableButton;
 			OnShot += CalculateShot;
 		}
@@ -30,16 +30,13 @@ namespace RSB.Main.Scripts
 		{
 			profileButton.onClick.RemoveListener(OpenProfileUI);
 			playerButton.onClick.RemoveListener(Bang);
-			GM.OnGameReady -= OnGameReady;
-			GM.OnGameReset -= OnGameReset;
+			ReflexGm.OnGameReady -= OnGameReady;
+			ReflexGm.OnGameReset -= OnGameReset;
 			OnShot -= DisableButton;
 			OnShot -= CalculateShot;
 		}
 
-		private void OpenProfileUI()
-		{
-			ProfileUI.Instance.Enter(playerImage);
-		}
+		private void OpenProfileUI() => ProfileUI.Instance.Enter(playerImage);
 
 		private void DisableButton(int x)
 		{
@@ -62,12 +59,12 @@ namespace RSB.Main.Scripts
 		{
 			if(playerNumber == pNumber)
 			{
-				if(GM.CanBang) Win();
+				if(ReflexGm.CanBang) Win();
 				else Lose();
 			}
 			else
 			{
-				if(GM.CanBang) Lose();
+				if(ReflexGm.CanBang) Lose();
 				else Win();
 			}
 		}
@@ -75,7 +72,7 @@ namespace RSB.Main.Scripts
 		private void Win()
 		{
 			playerTMP.gameObject.SetActive(true);
-			playerTMP.SetText("YOU WIN");
+			playerTMP.SetText("YOU WON");
 			playerButton.targetGraphic.color = winColor;
 		}
 
@@ -89,7 +86,7 @@ namespace RSB.Main.Scripts
 		private void Bang()
 		{
 			OnShot?.Invoke(playerNumber);
-			GM.Shot = true;
+			ReflexGm.Shot = true;
 		}
 	}
 }

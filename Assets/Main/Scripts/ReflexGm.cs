@@ -3,14 +3,15 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Quaternion = System.Numerics.Quaternion;
 using Random = UnityEngine.Random;
 namespace RSB.Main.Scripts
 {
-	public class GM : MonoBehaviour
+	public class ReflexGm : MonoBehaviour
 	{
 		[SerializeField] private Button readyButton,resetButton;
 		[SerializeField] private TextMeshProUGUI rsbTMP;
+		[SerializeField] private TextMeshProUGUI p1Count;
+		[SerializeField] private TextMeshProUGUI p2Count;
 		[SerializeField] private float minDuration,maxDuration;
 		public static bool CanBang,Shot;
 		public static event Action OnGameReset,OnGameReady;
@@ -23,14 +24,14 @@ namespace RSB.Main.Scripts
 		{
 			readyButton.onClick.AddListener(StartCounting);
 			resetButton.onClick.AddListener(ResetGame);
-			Player.OnShot += OpenResetButton;
+			ReflexPlayer.OnShot += OpenResetButton;
 		}
 
 		private void OnDisable()
 		{
 			readyButton.onClick.RemoveListener(StartCounting);
 			resetButton.onClick.RemoveListener(ResetGame);
-			Player.OnShot -= OpenResetButton;
+			ReflexPlayer.OnShot -= OpenResetButton;
 		}
 
 		private void ResetGame()
